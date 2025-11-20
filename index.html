@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Data Dashboard</title>
+    <!-- Load Tailwind CSS for utility-first styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load D3.js for creating custom, lightweight, and interactive charts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        /* Define a clean, system-based font for clarity and performance */
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            background-color: #f7f9fc;
+            /* Very light background for contrast */
+            color: #1f2937;
+        }
+
+        /* Custom class for the D3 chart container to ensure responsiveness */
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            /* Base height */
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Styling for the D3 SVG elements */
+        .chart-container .line {
+            fill: none;
+            stroke: #4f46e5;
+            stroke-width: 3px;
+        }
+
+        .chart-container .axis text {
+            fill: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .chart-container .axis path,
+        .chart-container .axis line {
+            stroke: #d1d5db;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">
+                Financial Overview Dashboard
+            </h1>
+            <button
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow transition duration-150">
+                Export Report
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Layout -->
+    <main class="max-w-7xl mx-auto mt-8 p-4 sm:p-6 lg:p-8">
+
+        <!-- 1. Key Performance Indicators (KIPs) - Clear Visual Hierarchy -->
+        <!-- Responsive grid for KIPs: 1 col on mobile, 2 on tablet, 4 on desktop -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+            <!-- KIP Card 1: Total Revenue -->
+            <div
+                class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
+                <div class="text-sm font-medium text-gray-500">Total Revenue (Q3)</div>
+                <div class="mt-1 text-3xl font-bold text-gray-900">$12.4M</div>
+                <div class="text-sm font-medium text-green-600 mt-2 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    +8.1% vs. Q2
+                </div>
+            </div>
+
+            <!-- KIP Card 2: New Client Acquisition -->
+            <div
+                class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
+                <div class="text-sm font-medium text-gray-500">New Clients</div>
+                <div class="mt-1 text-3xl font-bold text-gray-900">4,120</div>
+                <div class="text-sm font-medium text-green-600 mt-2 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    +12.5% vs. Target
+                </div>
+            </div>
+
+            <!-- KIP Card 3: Operating Expense -->
+            <div
+                class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
+                <div class="text-sm font-medium text-gray-500">Operating Expense</div>
+                <div class="mt-1 text-3xl font-bold text-gray-900">$3.9M</div>
+                <div class="text-sm font-medium text-red-600 mt-2 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                    </svg>
+                    -3.2% vs. Q2
+                </div>
+            </div>
+
+            <!-- KIP Card 4: Customer Satisfaction (NPS) -->
+            <div
+                class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
+                <div class="text-sm font-medium text-gray-500">Customer NPS Score</div>
+                <div class="mt-1 text-3xl font-bold text-gray-900">68</div>
+                <div class="text-sm font-medium text-yellow-600 mt-2 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                    Stable
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Main Visualization Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Main Chart Panel (2/3 width on desktop) -->
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Quarterly Performance Trend (Last 12 Months)</h2>
+                <!-- Container for the D3 Chart -->
+                <div id="line-chart" class="chart-container">
+                    <!-- D3/SVG content will be injected here -->
+                </div>
+            </div>
+
+            <!-- Secondary Data Panel (1/3 width on desktop) -->
+            <div class="lg:col-span-1 space-y-6">
+
+                <!-- Recent Transactions Widget (Text/Table Data) -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Recent Transactions</h3>
+                    <ul class="divide-y divide-gray-100">
+                        <li class="py-2 flex justify-between items-center text-sm">
+                            <span class="font-medium">Marketing Campaign</span>
+                            <span class="text-red-600 font-semibold">-$2,100</span>
+                        </li>
+                        <li class="py-2 flex justify-between items-center text-sm">
+                            <span class="font-medium">Software License Renewal</span>
+                            <span class="text-red-600 font-semibold">-$899</span>
+                        </li>
+                        <li class="py-2 flex justify-between items-center text-sm">
+                            <span class="font-medium">Client A Payment</span>
+                            <span class="text-green-600 font-semibold">+$4,500</span>
+                        </li>
+                        <li class="py-2 flex justify-between items-center text-sm">
+                            <span class="font-medium">Office Supplies</span>
+                            <span class="text-red-600 font-semibold">-$120</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Goal Progress Component (Lightweight Custom Chart) -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Annual Goal Progress</h3>
+                    <div class="space-y-4">
+                        <div class="text-sm font-medium text-gray-600">
+                            Revenue Target (85% Complete)
+                        </div>
+                        <!-- Simple Progress Bar using Tailwind -->
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-indigo-500 h-3 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Vanilla JS and D3 Implementation for Responsive Chart -->
+    <script>
+        // Data for the D3 Line Chart (Monthly Revenue)
+        const data = [
+            { date: '2024-11', value: 1.2 },
+            { date: '2024-12', value: 1.4 },
+            { date: '2025-01', value: 1.1 },
+            { date: '2025-02', value: 1.6 },
+            { date: '2025-03', value: 1.9 },
+            { date: '2025-04', value: 2.1 },
+            { date: '2025-05', value: 1.8 },
+            { date: '2025-06', value: 2.3 },
+            { date: '2025-07', value: 2.5 },
+            { date: '2025-08', value: 2.2 },
+            { date: '2025-09', value: 2.4 },
+            { date: '2025-10', value: 2.6 },
+        ];
+
+        // Format the date strings to Date objects
+        const parseDate = d3.timeParse("%Y-%m");
+        data.forEach(d => {
+            d.date = parseDate(d.date);
+            d.value = +d.value; // Convert value to number
+        });
+
+        const drawChart = () => {
+            const container = d3.select("#line-chart");
+            container.select("svg").remove(); // Clear previous chart on redraw
+
+            const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+            const containerWidth = container.node().clientWidth;
+            const containerHeight = container.node().clientHeight;
+
+            const width = containerWidth - margin.left - margin.right;
+            const height = containerHeight - margin.top - margin.bottom;
+
+            // Append SVG element to the container
+            const svg = container.append("svg")
+                .attr("width", containerWidth)
+                .attr("height", containerHeight)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // 1. Scales
+            const xScale = d3.scaleTime()
+                .domain(d3.extent(data, d => d.date))
+                .range([0, width]);
+
+            const yScale = d3.scaleLinear()
+                .domain([d3.min(data, d => d.value) - 0.5, d3.max(data, d => d.value) + 0.5])
+                .range([height, 0]);
+
+            // 2. Axes
+            const xAxis = d3.axisBottom(xScale)
+                .ticks(d3.timeMonth.every(1))
+                .tickFormat(d3.timeFormat("%b '%y"));
+
+            const yAxis = d3.axisLeft(yScale)
+                .tickFormat(d => `$${d}M`);
+
+            // Draw X Axis
+            svg.append("g")
+                .attr("class", "axis x-axis")
+                .attr("transform", `translate(0,${height})`)
+                .call(xAxis)
+                .selectAll("text")
+                .attr("transform", "rotate(-45)")
+                .style("text-anchor", "end");
+
+            // Draw Y Axis
+            svg.append("g")
+                .attr("class", "axis y-axis")
+                .call(yAxis);
+
+            // 3. Line Generator
+            const line = d3.line()
+                .x(d => xScale(d.date))
+                .y(d => yScale(d.value))
+                .curve(d3.curveMonotoneX); // Smooth the line
+
+            // 4. Draw Line Path
+            svg.append("path")
+                .datum(data)
+                .attr("class", "line")
+                .attr("d", line);
+
+            // 5. Add Tooltip/Interactive Circles (Optional: basic circles for demonstration)
+            svg.selectAll(".dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => xScale(d.date))
+                .attr("cy", d => yScale(d.value))
+                .attr("r", 5)
+                .attr("fill", "#4f46e5")
+                .attr("stroke", "#ffffff")
+                .attr("stroke-width", 2)
+                .on("mouseover", function (event, d) {
+                    // Simple console log for interaction demo
+                    console.log(`Date: ${d3.timeFormat("%b %Y")(d.date)}, Revenue: $${d.value}M`);
+                    d3.select(this).attr("r", 7).attr("fill", "#c7d2fe");
+                })
+                .on("mouseout", function () {
+                    d3.select(this).attr("r", 5).attr("fill", "#4f46e5");
+                });
+
+        };
+
+        // Initial chart draw
+        window.onload = drawChart;
+
+        // Redraw chart on window resize for responsiveness (Key Objective)
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(drawChart, 250); // Debounce for performance
+        });
+    </script>
+
+</body>
+
+</html>
